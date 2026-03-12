@@ -465,6 +465,21 @@ resource "azurerm_monitor_data_collection_rule_association" "syslog_dcr_ubuntu_a
 locals {
   unique_automation_suffix = substr(md5("${module.resource_group.name}-${var.location}"), 0, 6)
   unique_automation_name   = "${var.automation_account_name}-${local.unique_automation_suffix}"
+
+  # Accept either explicit UTC hour (HHMM) or a UTC offset like UTC+9, UTC+09:30, UTC-11:45.
+  user_timezone_normalized = upper(trimspace(var.user_timezone))
+  is_hhmm_timezone         = can(regex("^([01][0-9]|2[0-3])[0-5][0-9]$", local.user_timezone_normalized))
+  is_utc_offset_timezone   = can(regex("^UTC[+-](?:(?:0?[0-9]|1[0-3])(?::[0-5][0-9])?|14(?::00)?)$", local.user_timezone_normalized))
+  timezone_offset_sign     = local.is_utc_offset_timezone ? (can(regex("^UTC-", local.user_timezone_normalized)) ? -1 : 1) : null
+  timezone_offset_body     = local.is_utc_offset_timezone ? replace(replace(local.user_timezone_normalized, "UTC+", ""), "UTC-", "") : null
+  timezone_offset_parts    = local.timezone_offset_body != null ? split(":", local.timezone_offset_body) : []
+  timezone_offset_hour     = local.is_utc_offset_timezone ? tonumber(local.timezone_offset_parts[0]) : null
+  timezone_offset_minute   = local.is_utc_offset_timezone && length(local.timezone_offset_parts) == 2 ? tonumber(local.timezone_offset_parts[1]) : 0
+  timezone_offset_minutes  = local.is_utc_offset_timezone ? local.timezone_offset_sign * (local.timezone_offset_hour * 60 + local.timezone_offset_minute) : null
+  shutdown_utc_total_mins  = local.is_utc_offset_timezone ? ((19 * 60 - local.timezone_offset_minutes) % 1440 + 1440) % 1440 : null
+  shutdown_utc_hour        = local.shutdown_utc_total_mins != null ? floor(local.shutdown_utc_total_mins / 60) : null
+  shutdown_utc_minute      = local.shutdown_utc_total_mins != null ? local.shutdown_utc_total_mins % 60 : null
+  user_timezone_hour       = local.is_hhmm_timezone ? "${substr(local.user_timezone_normalized, 0, 2)}:${substr(local.user_timezone_normalized, 2, 2)}" : local.shutdown_utc_total_mins != null ? format("%02d:%02d", local.shutdown_utc_hour, local.shutdown_utc_minute) : "19:00"
 }
 
 module "automation_runbook" {
@@ -473,7 +488,7 @@ module "automation_runbook" {
   location                = var.location
   automation_account_name = local.unique_automation_name
   vmss_name               = var.vmss_name
-  user_timezone_hour      = length(var.user_timezone) == 4 ? "${substr(var.user_timezone, 0, 2)}:${substr(var.user_timezone, 2, 2)}" : "19:00"
+  user_timezone_hour      = local.user_timezone_hour
   subscription_id         = var.subscription_id
   aks_name                = var.aks_name
 

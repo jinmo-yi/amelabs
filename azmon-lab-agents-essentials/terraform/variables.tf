@@ -19,9 +19,14 @@ variable "subscription_id" {
 }
 
 variable "user_timezone" {
-  description = "User's timezone for auto-shutdown configuration"
+  description = "User timezone input. Supported formats: 'HHMM' UTC hour (for example '1000'), or UTC offset (for example 'UTC+9', 'UTC+09:30', 'UTC-11:45')."
   type        = string
   default     = "UTC"
+
+  validation {
+    condition = upper(trimspace(var.user_timezone)) == "UTC" || can(regex("^([01][0-9]|2[0-3])[0-5][0-9]$", upper(trimspace(var.user_timezone)))) || can(regex("^UTC[+-](?:(?:0?[0-9]|1[0-3])(?::[0-5][0-9])?|14(?::00)?)$", upper(trimspace(var.user_timezone))))
+    error_message = "user_timezone must be 'UTC', 'HHMM' (for example '1000'), or 'UTC+/-H[:MM]' (for example 'UTC+9' or 'UTC+09:30')."
+  }
 }
 
 variable "aks_name" {

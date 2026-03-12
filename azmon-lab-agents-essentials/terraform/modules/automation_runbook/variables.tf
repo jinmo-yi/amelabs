@@ -25,7 +25,7 @@ variable "user_timezone_hour" {
   description = "Hour in 24-hour format (HH:MM) when to shutdown VMSS in user's timezone converted to UTC"
   type        = string
   validation {
-    condition     = can(regex("^[0-2][0-9]:[0-5][0-9]$", var.user_timezone_hour))
+    condition     = can(regex("^([01][0-9]|2[0-3]):[0-5][0-9]$", var.user_timezone_hour))
     error_message = "The user_timezone_hour must be in HH:MM format (e.g., '19:00')."
   }
 }
