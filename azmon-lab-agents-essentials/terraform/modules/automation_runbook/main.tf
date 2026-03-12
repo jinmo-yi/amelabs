@@ -52,8 +52,8 @@ resource "azurerm_automation_schedule" "vmss_shutdown_schedule" {
   frequency               = "Day"
   interval                = 1
   timezone                = "UTC"
-  start_time              = timeadd(timestamp(), "10m")
-  #start_time              = "${formatdate("YYYY-MM-DD", timestamp())}T${var.user_timezone_hour}:00Z"
+  #start_time              = timeadd(timestamp(), "10m")
+  start_time              = "${formatdate("YYYY-MM-DD", timeadd(timestamp(), "1d"))}T${var.user_timezone_hour}:00Z"
   description             = "Daily schedule to shutdown VMSS at 19:00 in user timezone"
 
   # Ensure the start time is in the future
