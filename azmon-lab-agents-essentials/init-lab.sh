@@ -250,15 +250,15 @@ vmss_name      = "vmss-win"
 
 # Ubuntu VM Configuration
 ubuntu_vm_name         = "vm-ubuntu-lab"
-ubuntu_vm_size         = "Standard_B2s"
+ubuntu_vm_size         = "Standard_B2als_v2"
 
 # Windows VM Configuration
 windows_vm_name         = "vm-windows-lab"
-windows_vm_size         = "Standard_B2s"
+windows_vm_size         = "Standard_B2als_v2"
 
 # Red Hat VM Configuration
 redhat_vm_name         = "vm-redhat-lab"
-redhat_vm_size         = "Standard_B2s"
+redhat_vm_size         = "Standard_B2als_v2"
 
 # Automation Configuration
 automation_account_name = "aa-azmon-autoshutdown"
