@@ -58,7 +58,7 @@ resource "azurerm_automation_schedule" "vmss_shutdown_schedule" {
 
   # Ensure the start time is in the future
   lifecycle {
-    ignore_changes = [start_time]
+    # ignore_changes = [start_time]
   }
 }
 
