@@ -44,13 +44,6 @@ resource "azurerm_role_assignment" "automation_contributor" {
   principal_id         = azurerm_automation_account.automation.identity[0].principal_id
 }
 
-locals {
-  # Keep a 10-minute buffer so provider validation (>=5 minutes in future) is always satisfied.
-  min_valid_start_time = timeadd(timestamp(), "10m")
-  start_time_today     = "${formatdate("YYYY-MM-DD", timestamp())}T${var.user_timezone_hour}:00Z"
-  start_time_tomorrow  = "${formatdate("YYYY-MM-DD", timeadd(timestamp(), "24h"))}T${var.user_timezone_hour}:00Z"
-  schedule_start_time  = timecmp(local.start_time_today, local.min_valid_start_time) == 1 ? local.start_time_today : local.start_time_tomorrow
-}
 
 # Create schedule for the runbook (daily at 19:00 in user's timezone)
 resource "azurerm_automation_schedule" "vmss_shutdown_schedule" {
@@ -60,7 +53,7 @@ resource "azurerm_automation_schedule" "vmss_shutdown_schedule" {
   frequency               = "Day"
   interval                = 1
   timezone                = "UTC"
-  start_time              = local.schedule_start_time
+  start_time              = timeadd("${formatdate("YYYY-MM-DD", timestamp())}T${var.user_timezone_hour}:00Z", "24h")
   description             = "Daily schedule to shutdown VMSS at 19:00 in user timezone"
 
   # Ensure the start time is in the future
