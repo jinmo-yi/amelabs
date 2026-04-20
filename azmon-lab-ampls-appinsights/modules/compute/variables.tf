@@ -54,7 +54,7 @@ variable "admin_password" {
 variable "vm_size" {
   description = "Size of the virtual machines"
   type        = string
-  default     = "Standard_B1s"
+  default     = "Standard_B2ats_v2"
 }
 
 variable "os_disk_storage_account_type" {

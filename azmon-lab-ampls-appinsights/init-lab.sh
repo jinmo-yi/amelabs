@@ -91,6 +91,7 @@ ALLOWED_REGIONS=(
   "canadacentral"
   "centralindia"
   "centralus"
+  "koreacentral"
   "eastasia"
   "francecentral"
   "norwayeast"

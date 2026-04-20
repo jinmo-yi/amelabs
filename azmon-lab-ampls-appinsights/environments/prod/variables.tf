@@ -43,7 +43,7 @@ variable "admin_password" {
 variable "vm_size" {
   description = "Size of the virtual machines"
   type        = string
-  default     = "Standard_B2s"  # Supports Gen2, 2 vCPUs, 4GB RAM
+  default     = "Standard_B2als_v2"  # Supports Gen2, 2 vCPUs, 4GB RAM
 }
 
 variable "enable_public_ips" {
